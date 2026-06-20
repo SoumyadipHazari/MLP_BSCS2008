@@ -499,3 +499,156 @@ frame2.columns
 
 # Index(['Year', 'State', 'PoP', 'debt'], dtype='str')
 ```
+
+> let there is a nested dictionary is passed to the DataFrame, pandas will interpret the
+outer dictionary keys as the columns, and the inner keys as the row indices :
+
+so when we pass a nested dictionary like 
+
+```python
+
+{
+    "Ohio": {
+        2000: 1.2,
+        2001: 1.3,
+        2002: 3.6
+    },
+    "Kolkata": {
+        2001: 2.4,
+        2002: 2.9
+    }
+}
+
+```
+
+then 
+- Outer keys --> Columns
+- Inner keys --> Row indices
+- Inner  Values --> Cell Values
+
+```python
+
+population = {"ohio": {2000:1.2, 2001:1.3, 2002: 3.6},
+             "Texas": {2001: 2.4, 2002: 2.9}}
+
+frmae3 = pd.DataFrame(population)
+frame3
+
+"""
+|ohio|Texas|
+|---|---|
+|2000|1.2|NaN|
+|2001|1.3|2.4|
+|2002|3.6|2.9|
+"""
+
+```
+
+> we can shift the position of the row and column
+
+```python
+
+frame3.T
+
+"""
+|2000|2001|2002|
+|---|---|---|
+|ohio|1.2|1.3|3.6|
+|Texas|NaN|2.4|2.9|
+"""
+
+```
+
+
+| Type                                  | Notes                                                                                                                                                               |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2D ndarray                            | A matrix of data, passing optional row and column labels                                                                                                            |
+| Dictionary of array, lists, or tuples | Each sequence becomes a column in the DataFrame; all sequences must be the same length                                                                              |
+| NumPy structured /record array        | Treated as the "dictionary of array" case                                                                                                                           |
+| Dictionary of dictionaries            | Each inner dictionary becomes a column; keys are unioned to form the row index as in the "dictionary of Series" case                                                |
+| Dictionary of Series                  | Each value becomes a column; indexes from each Series are unioned<br>Dictionary of Series<br>together to form the result’s row index if no explicit index is passed |
+| List of dictionaries or Series        | Each item becomes a row in the DataFrame; unions of dictionary keys or Series indexes become the DataFrame's column labels                                          |
+| List of list or tuples                | Treated as the "2D ndarray" case                                                                                                                                    |
+| Another DataFrame                     | The DataFrame’s indexes are used unless different ones are passed                                                                                                   |
+| NumPy MaskedArray                     | Like the “2D ndarray” case except masked values are missing in the DataFrame result                                                                                 |
+>Unlike Series, DataFrame does not have a name attribute. DataFrame's `to_numpy` method returns the data contained in the DataFrame as a two-dimensional ndarray:
+
+```python
+
+frame3.to_numpy()
+"""
+array([[1.2, nan],
+       [1.3, 2.4],
+       [3.6, 2.9]])
+"""
+# if the datatypes of the DataFrame's columns are different data types, the data type of the returned array will be chosen to accommodate all of the columns
+
+frame2.to_numpy()
+"""
+array([[2000, 'Ohio', 1.5, nan],
+       [2001, 'Ohio', 1.6, nan],
+       [2002, 'Ohio', 3.6, -1.2],
+       [2001, 'Texas', 2.4, nan],
+       [2002, 'Texas', 2.9, -1.5],
+       [2003, 'Texas', 3.2, -1.7],
+       [2001, 'kolkata', 2.6, nan],
+       [2002, 'kolkata', 2.8, nan],
+       [2003, 'kolkata', 3.4, nan]], dtype=object)
+"""
+```
+
+
+# Index Objects
+
+[[index_objects.ipynb]]
+
+Panda's Index objects are responsible for holding the axis labels (including a DataFrame's) and other metadata.
+
+Any array or other sequence of labels you use when constructing a Series of DataFrame is internally converted to an index.
+
+```python
+
+obj = pd.Series(np.arange(3), index=["a","b","c"])
+index = obj.index
+
+index
+
+#Index(['b', 'a', 'c'], dtype='str') 
+
+
+```
+
+>Index objects are immutable in nature (can't be modified by the user) so it makes safer to share Index objects among data structures:
+
+```
+
+index[1] = "d"
+
+#TypeError: Index does not support mutable operations
+
+```
+
+```python
+
+labels = pd.Index(np.arange(4))
+
+labels
+
+#Index([0, 1, 2, 3], dtype='int64')
+
+obj2 = pd.Series([-1.3,4.5,-9.8], index = labels)
+
+#gives you this -- ValueError: Length of values (3) does not match length of index (4)
+obj2 = pd.Series([-1.3,4.5,-9.8,2.1], index = labels)
+obj2
+
+
+"""
+1    1.2
+3    3.4
+5   -5.6
+7    2.1
+dtype: float64
+"""
+
+```
