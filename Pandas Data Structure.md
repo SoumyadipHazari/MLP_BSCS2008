@@ -652,3 +652,26 @@ dtype: float64
 """
 
 ```
+
+> Unlike Python sets, a pandas Index can contain duplicate labels:
+
+```python
+
+pd.Index(["foo","foo","faa","faa"])
+
+#gives Index(['foo', 'foo', 'faa', 'faa'], dtype='str')
+```
+
+| Method         | Description                                                                               |
+| -------------- | ----------------------------------------------------------------------------------------- |
+| append()       | concatenate with additional index objects, producing a new index                          |
+| difference()   | Compute set difference as an index                                                        |
+| intersection() | compute set intersection                                                                  |
+| union()        | compute set union                                                                         |
+| isin()         | compute boolean array indicating whether each value is contained in the passed collection |
+| delete()       | Compute new Index with element at Index i deleted                                         |
+| drop()         | Compute new Index by deleting passed values                                               |
+| insert()       | Compute new Index by inserting element at Index i                                         |
+| is_monotonic   | Returns True if each element is greater than or equal to the previous element             |
+| is_unique      | Returns True if the Index has no duplicate values                                         |
+| unique()       | Compute the array of unique values in the Index                                           |
